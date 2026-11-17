@@ -3,12 +3,14 @@ import {
   Table,
   Column,
   Model,
-  DataType,
+  HasMany,
   CreatedAt,
   UpdatedAt,
   DeletedAt,
 } from 'sequelize-typescript';
+import { Entry } from '../entry/entry.model.js';
 
+@Table({ tableName: 'users' })
 export class User extends Model {
   @Column({
     type: DataTypes.UUID,
@@ -17,14 +19,17 @@ export class User extends Model {
   })
   declare id: string;
 
-  @Column({ type: DataTypes.STRING })
+  @Column({ type: DataTypes.STRING, allowNull: false })
   declare userName: string;
 
-  @Column({
-    type: DataTypes.STRING,
-    defaultValue: '',
-  })
+  @Column({ type: DataTypes.STRING, allowNull: false, unique: true })
   declare email: string;
+
+  @Column({ type: DataTypes.STRING, defaultValue: '' })
+  declare homePage: string;
+
+  @HasMany(() => Entry)
+  declare entries: Entry[];
 
   @CreatedAt
   declare createdAt: Date;

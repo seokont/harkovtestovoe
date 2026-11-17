@@ -1,20 +1,27 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto.js';
-import { UpdateUserDto } from './dto/update-user.dto.js';
-import { User } from '../user/user.model.js';
 import { InjectModel } from '@nestjs/sequelize';
+import { User } from './user.model.js';
+
+export interface CreateUserInput {
+  userName: string;
+  email: string;
+  homePage?: string;
+}
 
 @Injectable()
 export class UserService {
-  constructor(
-    @InjectModel(User)
-    private userModel: typeof User,
-  ) {}
-  create(createUserDto: CreateUserDto): Promise<User> {
-    return this.userModel.create({
-      userName: createUserDto.userName,
-      email: createUserDto.email ?? '',
-    });
+  constructor(@InjectModel(User) private readonly userModel: typeof User) {}
+
+  async findOrCreate(input: CreateUserInput): Promise<User> {
+    let user = await this.userModel.findOne({ where: { email: input.email } });
+    if (!user) {
+      user = await this.userModel.create({
+        userName: input.userName,
+        email: input.email,
+        homePage: input.homePage ?? '',
+      });
+    }
+    return user;
   }
 
   findAll(): Promise<User[]> {
@@ -22,24 +29,6 @@ export class UserService {
   }
 
   findOne(id: string): Promise<User | null> {
-    return this.userModel.findOne({
-      where: {
-        id,
-      },
-    });
-  }
-
-  update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
-    return this.userModel
-      .update(updateUserDto, {
-        where: {
-          id,
-        },
-      })
-      .then(() => this.findOne(id));
-  }
-
-  remove(id: string) {
-    return `This action removes a #${id} user`;
+    return this.userModel.findByPk(id);
   }
 }

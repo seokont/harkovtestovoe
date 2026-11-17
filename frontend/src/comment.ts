@@ -1,9 +1,31 @@
-﻿export interface CommentEntry {
+export interface CommentNode {
   id: string
-  userName?: string
-  referenceId?: string | null
   text: string
-  createdAt?: string
-  date?: string
+  imagePath: string | null
+  textFilePath: string | null
+  parentId: string | null
+  userId: string
+  userName: string
+  email: string
+  homePage: string
+  createdAt: string
+  children: CommentNode[]
 }
-export interface CommentNode extends CommentEntry { children: CommentNode[] }
+
+export interface EntryListResult {
+  items: CommentNode[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface CaptchaResponse {
+  captchaId: string
+  svg: string
+}
+
+export interface CreateEntryResponse {
+  entry: CommentNode
+  token: string
+}
